@@ -1,5 +1,5 @@
-name: after_first_build
-description: A packages that provides a callback that is executed after the first build or after the next frame.
+name: base_text_field
+description: A packages that creates a declarative api for flutters TextField
 version: 0.0.1
 publish_to: none
 
@@ -10,6 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  after_first_build:
+    path: ../../packages/after_first_build
 
 dev_dependencies:
   flutter_test:
