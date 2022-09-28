@@ -11,6 +11,11 @@ dependencies:
   flutter:
     sdk: flutter
 
+  some_test:
+    git:
+      url: "https."
+      path: /directory
+
   after_first_build:
     path: packages/after_first_build
 
