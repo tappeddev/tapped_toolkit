@@ -109,12 +109,13 @@ dependencies:
   # Installing all packages
   tapped_toolkit:
     git:
-      url: https://github.com/tappeddev/tapped_toolkit.git
+      url: git@github.com:tappeddev/tapped_toolkit.git
       ref: stable
 
+  # Installing selected package
   after_first_build:
     git:
-      url: https://github.com/tappeddev/tapped_toolkit.git
+      url: git@github.com:tappeddev/tapped_toolkit.git
       ref: stable
       path: packages/after_first_build
 ````
