@@ -12,10 +12,10 @@ dependencies:
     sdk: flutter
 
   after_first_build:
-    path: packages/after_first_build
+    path: ./packages/after_first_build
 
   base_text_field:
-    path: packages/base_text_field
+    path: ./packages/base_text_field
 
 dev_dependencies:
   flutter_test:
