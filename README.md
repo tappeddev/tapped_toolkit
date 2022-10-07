@@ -71,7 +71,7 @@ void main() {
 }
 ````
 
-#### 4. Pipline stages
+#### 4. Pipeline stages
 
 CI/CD is part of every application we build at tapped.
 Independent of the platform executing the pipeline (mostly GitHub or GitLab) most projects configure the pipeline to
@@ -100,22 +100,14 @@ Execute tests using `fvm flutter test`
 
 TODO talk about deployment using fastlane if needed.
 
-### Installing any of the packages included in tapped toolkit
+### Installing the tapped toolkit 
 
 Right now the packages are not published to pub and adding them is done using the `git` keyword.
 
 ````yaml
 dependencies:
-  # Installing all packages
   tapped_toolkit:
     git:
       url: git@github.com:tappeddev/tapped_toolkit.git
       ref: stable
-
-  # Installing selected package
-  after_first_build:
-    git:
-      url: git@github.com:tappeddev/tapped_toolkit.git
-      ref: stable
-      path: packages/after_first_build
 ````

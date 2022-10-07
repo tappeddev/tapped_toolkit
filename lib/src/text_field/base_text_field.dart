@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:after_first_build/after_first_build.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:tapped_toolkit/src/after_first_build/after_first_build_mixin.dart';
+import 'package:tapped_toolkit/src/after_first_build/on_next_frame_extension.dart';
 
 typedef TextStyleMutation = TextStyle Function(TextStyle style);
 
