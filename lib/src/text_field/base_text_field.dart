@@ -80,8 +80,6 @@ class BaseTextField extends StatefulWidget {
 
 class BaseTextFieldState extends State<BaseTextField>
     with AfterFirstBuildMixin {
-  final _formFieldKey = GlobalKey<FormFieldState<BaseTextFieldState>>();
-
   late final _focusNode = widget.focusNode ?? FocusNode();
 
   late TextEditingController _textEditingController;
@@ -137,7 +135,6 @@ class BaseTextFieldState extends State<BaseTextField>
     final style = widget.textStyle;
 
     return TextFormField(
-      key: _formFieldKey,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
       maxLength: widget.maxLength,
@@ -204,8 +201,6 @@ class BaseTextFieldState extends State<BaseTextField>
       });
     }
   }
-
-  bool validate() => _formFieldKey.currentState!.validate();
 
   @override
   void dispose() {
