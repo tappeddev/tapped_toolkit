@@ -160,10 +160,8 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
 
     final mediaQuery = MediaQuery.of(context);
 
-    final maximumAvailableHeight = mediaQuery.size.height -
-        offset.dy -
-        mediaQuery.viewPadding.vertical; // -
-       // widget.itemHeight; //TODO
+    final maximumAvailableHeight =
+        mediaQuery.size.height - offset.dy - mediaQuery.viewPadding.vertical;
 
     final topOffset = offset.dy;
     return OverlayEntry(
