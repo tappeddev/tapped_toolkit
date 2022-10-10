@@ -10,7 +10,7 @@ class CustomDropDown<T> extends StatefulWidget {
   ) buildItem;
   final void Function(T) onChanged;
   final List<CustomDropDownItem<T>> items;
-  final String? Function(T?) validator;
+  final String? Function(T?)? validator;
   final bool autoValidate;
   final double itemHeight;
   final double cornerRadius;
@@ -25,10 +25,10 @@ class CustomDropDown<T> extends StatefulWidget {
     required this.buildItem,
     required this.onChanged,
     required this.items,
-    required this.validator,
     required this.borderColor,
     required this.textStyle,
-    required this.errorStyle,
+    this.validator,
+    this.errorStyle,
     this.autoValidate = false,
     this.itemHeight = 48.0,
     this.cornerRadius = 10,
