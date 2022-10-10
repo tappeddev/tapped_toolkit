@@ -5,7 +5,7 @@ class CustomDropDown<T> extends StatefulWidget {
   /// The selected value or null if nothing is selected.
   final T? value;
 
-  /// Builds every item that is shown in the drop down.
+  /// Builds the button that the user can press to open the drop down.
   /// While the drop down opens use the [animation] to animate any additional
   /// widgets.
   /// Validation information is exposed in [formField] which can be used
@@ -14,7 +14,7 @@ class CustomDropDown<T> extends StatefulWidget {
     BuildContext context,
     Animation<double> animation,
     FormFieldState<T> formField,
-  ) buildItem;
+  ) buildButton;
 
   /// Called when the user selected an item.
   final void Function(T) onChanged;
@@ -45,7 +45,7 @@ class CustomDropDown<T> extends StatefulWidget {
 
   const CustomDropDown({
     required this.value,
-    required this.buildItem,
+    required this.buildButton,
     required this.onChanged,
     required this.items,
     required this.borderColor,
@@ -116,7 +116,7 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
                         ? Radius.zero
                         : Radius.circular(widget.cornerRadius),
                   ),
-                  item: widget.buildItem(
+                  item: widget.buildButton(
                     context,
                     _animationController,
                     _formFieldKey.currentState!,
@@ -318,7 +318,7 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
 /// A simple data class that holds all the data of on item.
 class CustomDropDownItem<T> {
   /// The value of the item or null if the item
-  /// is the placeholder for the drop down.
+  /// is returned in [CustomDropDown.buildButton].
   final T? value;
 
   /// The widget for the given [value].
