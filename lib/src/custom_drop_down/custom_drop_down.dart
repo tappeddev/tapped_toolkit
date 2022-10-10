@@ -105,8 +105,9 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
                 alignment: Alignment.centerLeft,
                 child: Text(
                   state.errorText ?? "",
-                  style: effectiveDecoration.errorStyle!
-                      .copyWith(color: theme.errorColor),
+                  style: effectiveDecoration.errorStyle ??
+                      theme.textTheme.caption!
+                          .copyWith(color: theme.errorColor),
                 ),
               ),
           ],
