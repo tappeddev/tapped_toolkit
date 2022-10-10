@@ -15,7 +15,8 @@ class CustomDropDown<T> extends StatefulWidget {
   final double itemHeight;
   final double cornerRadius;
 
-  final TextStyle defaultTextStyle;
+  final TextStyle textStyle;
+  final TextStyle? errorStyle;
 
   final Color borderColor;
 
@@ -26,7 +27,8 @@ class CustomDropDown<T> extends StatefulWidget {
     required this.items,
     required this.validator,
     required this.borderColor,
-    required this.defaultTextStyle,
+    required this.textStyle,
+    required this.errorStyle,
     this.autoValidate = false,
     this.itemHeight = 48.0,
     this.cornerRadius = 10,
@@ -105,7 +107,8 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
                 alignment: Alignment.centerLeft,
                 child: Text(
                   state.errorText ?? "",
-                  style: effectiveDecoration.errorStyle ??
+                  style: widget.errorStyle ??
+                      effectiveDecoration.errorStyle ??
                       theme.textTheme.caption!
                           .copyWith(color: theme.errorColor),
                 ),
@@ -139,7 +142,7 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
           borderRadius: borderRadius,
           onTap: onTap,
           child: DefaultTextStyle(
-            style: widget.defaultTextStyle,
+            style: widget.textStyle,
             child: item.child,
           ),
         ),
