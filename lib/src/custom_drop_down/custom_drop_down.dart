@@ -1,20 +1,35 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:tapped_toolkit/tapped_toolkit.dart';
+import 'package:tapped_toolkit/src/after_first_build/on_next_frame_extension.dart';
 
 class CustomDropDown<T> extends StatefulWidget {
   final T? value;
+  final CustomDropDownItem<T> Function(
+    BuildContext context,
+    Animation<double> animation,
+    FormFieldState<T> formField,
+  ) buildItem;
   final void Function(T) onChanged;
-  final List<DropdownItem<T>> items;
+  final List<CustomDropDownItem<T>> items;
   final String? Function(T?) validator;
-  final bool readOnly;
+  final bool autoValidate;
+  final double itemHeight;
+  final double cornerRadius;
+
+  final TextStyle defaultTextStyle;
+
+  final Color borderColor;
 
   const CustomDropDown({
     required this.value,
+    required this.buildItem,
     required this.onChanged,
     required this.items,
     required this.validator,
-    this.readOnly = false,
+    required this.borderColor,
+    required this.defaultTextStyle,
+    this.autoValidate = false,
+    this.itemHeight = 48.0,
+    this.cornerRadius = 10,
     Key? key,
   }) : super(key: key);
 
@@ -27,133 +42,92 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
   final _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
   bool _isOpen = false;
-  late final _animationController = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 200),
-  );
+  late final AnimationController _animationController;
+
   final _formFieldKey = GlobalKey<FormFieldState<T>>();
   final _boxKey = GlobalKey();
 
-  static const _itemHeight = 48.0;
-
-  bool? _parentAutoValidate;
-  bool _internalAutoValidate = false;
-
-  Color get _borderColor => StylingTheme.of(context).shadeColor50;
-
-  double get _cornerRadius => StylingTheme.of(context).borderRadius;
-
-  TextStyle get _textStyle => StylingTheme.of(context).textStyleGroup.button1;
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final rotateAnimation = Tween(begin: 0.0, end: 0.5).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOut,
-      ),
-    );
+    final theme = Theme.of(context);
 
-    final currentWidget = widget.items
-            .firstWhereOrNull((item) => item.value == widget.value)
-            ?.child ??
-        _buildHintText();
+    final effectiveDecoration =
+        const InputDecoration().applyDefaults(theme.inputDecorationTheme);
 
-    final notificationColor = StylingTheme.of(context).notificationColor;
-
-    final autoValidate = _parentAutoValidate ?? _internalAutoValidate;
-    return IgnorePointer(
-      ignoring: widget.readOnly,
-      child: Opacity(
-        opacity: widget.readOnly ? 0.5 : 1.0,
-        child: FormField<T>(
-          key: _formFieldKey,
-          initialValue: widget.value,
-          autovalidateMode: autoValidate ? AutovalidateMode.always : null,
-          validator: widget.validator,
-          builder: (state) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CompositedTransformTarget(
-                  link: _layerLink,
-                  child: SizedBox(
-                    key: _boxKey,
-                    width: double.infinity,
-                    child: _buildItem(
-                      onTap: () {
-                        // close the keyboard when user tap on the item
-                        FocusManager.instance.primaryFocus?.unfocus();
-                        _toggleDropdown();
-                      },
-                      border: Border.all(
-                        color:
-                            state.hasError ? notificationColor : _borderColor,
-                      ),
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(_cornerRadius),
-                        bottom: _isOpen
-                            ? Radius.zero
-                            : Radius.circular(_cornerRadius),
-                      ),
-                      textColor: state.hasError ? notificationColor : null,
-                      child: Row(
-                        children: [
-                          Expanded(child: currentWidget),
-                          RotationTransition(
-                            turns: rotateAnimation,
-                            child: LocalImage.icon(
-                              AppIcons.chevronDown,
-                              color: state.hasError
-                                  ? notificationColor
-                                  : _textStyle.color,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+    return FormField<T>(
+      key: _formFieldKey,
+      initialValue: widget.value,
+      autovalidateMode: widget.autoValidate
+          ? AutovalidateMode.always
+          : AutovalidateMode.disabled,
+      validator: widget.validator,
+      builder: (state) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CompositedTransformTarget(
+              link: _layerLink,
+              child: SizedBox(
+                key: _boxKey,
+                width: double.infinity,
+                child: _buildItem(
+                  onTap: _toggleDropdown,
+                  border: Border.all(
+                    color:
+                        state.hasError ? theme.errorColor : widget.borderColor,
+                  ),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(widget.cornerRadius),
+                    bottom: _isOpen
+                        ? Radius.zero
+                        : Radius.circular(widget.cornerRadius),
+                  ),
+                  item: widget.buildItem(
+                    context,
+                    _animationController,
+                    _formFieldKey.currentState!,
                   ),
                 ),
-                if (state.hasError)
-                  Container(
-                    padding: const EdgeInsets.only(top: 8, left: 16),
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      state.errorText ?? "",
-                      style: StylingTheme.of(context)
-                          .textStyleGroup
-                          .headline5
-                          .copyWith(color: notificationColor),
-                    ),
-                  ),
-              ],
-            );
-          },
-        ),
-      ),
+              ),
+            ),
+            if (state.hasError)
+              Container(
+                padding: const EdgeInsets.only(top: 8, left: 16),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  state.errorText ?? "",
+                  style: effectiveDecoration.errorStyle!
+                      .copyWith(color: theme.errorColor),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 
-  bool validate() {
-    setState(() => _internalAutoValidate = true);
-    return _formFieldKey.currentState!.validate();
-  }
+  bool validate() => _formFieldKey.currentState!.validate();
 
   Widget _buildItem({
     required VoidCallback onTap,
-    required Widget child,
-    Key? key,
-    BorderRadius? borderRadius,
-    Border? border,
-    Color? color,
-    Color? textColor,
+    required CustomDropDownItem<T> item,
+    required BorderRadius? borderRadius,
+    required Border? border,
   }) {
     return AnimatedContainer(
-      key: key,
-      height: _itemHeight,
+      height: widget.itemHeight,
       duration: const Duration(milliseconds: 180),
       decoration: BoxDecoration(
-        color: color,
+        color: item.backgroundColor,
         borderRadius: borderRadius,
         border: border,
       ),
@@ -163,16 +137,9 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
         child: InkWell(
           borderRadius: borderRadius,
           onTap: onTap,
-          child: Container(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: DefaultTextStyle(
-              style: DefaultTextStyle.of(context)
-                  .style
-                  .merge(_textStyle)
-                  .copyWith(color: textColor),
-              child: child,
-            ),
+          child: DefaultTextStyle(
+            style: widget.defaultTextStyle,
+            child: item.child,
           ),
         ),
       ),
@@ -185,14 +152,14 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
 
     final offset = renderBox.localToGlobal(Offset.zero);
 
-    final neededHeight = offset.dy + (widget.items.length * _itemHeight);
+    final neededHeight = offset.dy + (widget.items.length * widget.itemHeight);
 
     final mediaQuery = MediaQuery.of(context);
 
     final maximumAvailableHeight = mediaQuery.size.height -
         offset.dy -
         mediaQuery.padding.vertical -
-        _itemHeight;
+        widget.itemHeight;
 
     final topOffset = offset.dy;
     return OverlayEntry(
@@ -258,26 +225,29 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
         children: [
           for (int i = 0; i < widget.items.length; i++) ...[
             _buildItem(
-              key: widget.items[i].key,
-              color: StylingTheme.of(context).shadeColor80,
               onTap: () {
                 _toggleDropdown();
-                widget.onChanged(widget.items[i].value);
+
+                final selectedValue = widget.items[i].value;
+
+                widget.onChanged(selectedValue as T);
               },
               border: Border(
-                top: i > 0 ? BorderSide(color: _borderColor) : BorderSide.none,
-                left: BorderSide(color: _borderColor),
-                right: BorderSide(color: _borderColor),
+                top: i > 0
+                    ? BorderSide(color: widget.borderColor)
+                    : BorderSide.none,
+                left: BorderSide(color: widget.borderColor),
+                right: BorderSide(color: widget.borderColor),
                 bottom: i == widget.items.length - 1
-                    ? BorderSide(color: _borderColor)
+                    ? BorderSide(color: widget.borderColor)
                     : BorderSide.none,
               ),
               borderRadius: i == widget.items.length - 1
                   ? BorderRadius.vertical(
-                      bottom: Radius.circular(_cornerRadius),
+                      bottom: Radius.circular(widget.cornerRadius),
                     )
                   : null,
-              child: widget.items[i].child,
+              item: widget.items[i],
             ),
           ]
         ],
@@ -286,21 +256,12 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
   }
 
   @override
-  void didUpdateWidget(covariant OutlinedDropDown<T> oldWidget) {
-    assert(
-      AutoForm.of(context) != null,
-      "$this - AutoForm need to be part of the tree",
-    );
+  void didUpdateWidget(covariant CustomDropDown<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
 
     if (oldWidget.value != widget.value) {
-      onNextFrame(() {
-        final newValue = widget.value;
-        _formFieldKey.currentState!.didChange(newValue);
-      });
+      onNextFrame(() => _formFieldKey.currentState!.didChange(widget.value));
     }
-
-    _parentAutoValidate = AutoForm.of(context)!.autoValidate.value;
-    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -315,14 +276,7 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
     super.dispose();
   }
 
-  Widget _buildHintText() {
-    return Text(
-      context.translate("drop_down_hint"),
-      style: _textStyle.copyWith(color: StylingTheme.of(context).shadeColor50),
-    );
-  }
-
-  void _toggleDropdown() async {
+  Future<void> _toggleDropdown() async {
     if (_isOpen) {
       await _animationController.reverse();
       _overlayEntry?.remove();
@@ -336,14 +290,16 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
   }
 }
 
-class DropdownItem<T> {
-  final T value;
+class CustomDropDownItem<T> {
+  final T? value;
   final Widget child;
+  final Color backgroundColor;
   final Key? key;
 
-  const DropdownItem({
+  const CustomDropDownItem({
     required this.value,
     required this.child,
+    required this.backgroundColor,
     this.key,
   });
 }
