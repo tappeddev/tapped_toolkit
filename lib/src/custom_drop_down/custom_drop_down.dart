@@ -2,22 +2,45 @@ import 'package:flutter/material.dart';
 import 'package:tapped_toolkit/src/after_first_build/on_next_frame_extension.dart';
 
 class CustomDropDown<T> extends StatefulWidget {
+  /// The selected value or null if nothing is selected.
   final T? value;
+
+  /// Builds every item that is shown in the drop down.
+  /// While the drop down opens use the [animation] to animate any additional
+  /// widgets.
+  /// Validation information is exposed in [formField] which can be used
+  /// to adjust your UI if an error occurred.
   final CustomDropDownItem<T> Function(
     BuildContext context,
     Animation<double> animation,
     FormFieldState<T> formField,
   ) buildItem;
+
+  /// Called when the user selected an item.
   final void Function(T) onChanged;
+
+  /// The items available in the drop down.
   final List<CustomDropDownItem<T>> items;
-  final String? Function(T?)? validator;
+
+  /// Validator function that should return an error text for the given [value].
+  final String? Function(T? value)? validator;
+
+  /// If the underlying [FormField] should auto validate or not.
   final bool autoValidate;
+
+  /// The height of every item.
   final double itemHeight;
+
+  /// The corner radius that animates when the drop down opens of closes
   final double cornerRadius;
 
+  /// [TextStyle] that is provided to the items as [DefaultTextStyle].
   final TextStyle textStyle;
+
+  /// [TextStyle] for the error that is displayed below the button.
   final TextStyle? errorStyle;
 
+  /// Color for the border.
   final Color borderColor;
 
   const CustomDropDown({
@@ -292,10 +315,19 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
   }
 }
 
+/// A simple data class that holds all the data of on item.
 class CustomDropDownItem<T> {
+  /// The value of the item or null if the item
+  /// is the placeholder for the drop down.
   final T? value;
+
+  /// The widget for the given [value].
   final Widget child;
+
+  /// The color that is visible behind the [child].
   final Color backgroundColor;
+
+  /// The direct key of the widget that [child] is wrapped in.
   final Key? key;
 
   const CustomDropDownItem({
