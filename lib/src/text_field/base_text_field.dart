@@ -82,6 +82,8 @@ class BaseTextFieldState extends State<BaseTextField>
     with AfterFirstBuildMixin {
   late final _focusNode = widget.focusNode ?? FocusNode();
 
+  final _formFieldKey = GlobalKey<FormFieldState<String>>();
+
   late TextEditingController _textEditingController;
 
   @visibleForTesting
@@ -135,6 +137,7 @@ class BaseTextFieldState extends State<BaseTextField>
     final style = widget.textStyle;
 
     return TextFormField(
+      key: _formFieldKey,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
       maxLength: widget.maxLength,
@@ -169,7 +172,14 @@ class BaseTextFieldState extends State<BaseTextField>
       // use onChange instead of [TextEditingController.addListener]
       // because this will notify a text change when we loose focus
       // when routing back. This will trigger a new search which is wrong.
-      onChanged: (string) => widget.onChanged(string),
+      onChanged: (string) {
+        // we always want to validate the new input when the current state is invalid
+        if (!_textFieldIsValid) {
+          _formFieldKey.currentState?.validate();
+        }
+
+        widget.onChanged(string);
+      },
       decoration: widget.decoration,
     );
   }
