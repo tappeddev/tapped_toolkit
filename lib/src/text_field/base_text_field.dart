@@ -11,6 +11,7 @@ class BaseTextField extends StatefulWidget {
   final String text;
 
   final ValueChanged<String> onChanged;
+  final void Function(String value)? onFieldSubmitted;
   final String? Function(String? value)? validator;
   final TextStyle Function(TextStyle)? textStyleMutator;
   final TextStyle textStyle;
@@ -54,6 +55,7 @@ class BaseTextField extends StatefulWidget {
     required this.onChanged,
     required this.decoration,
     required this.textStyle,
+    this.onFieldSubmitted,
     this.onValidationChanged,
     this.textInputType,
     this.focusNode,
@@ -143,6 +145,7 @@ class BaseTextFieldState extends State<BaseTextField>
       maxLength: widget.maxLength,
       autofillHints: widget.autofillHints,
       inputFormatters: widget.inputFormatter,
+      onFieldSubmitted: widget.onFieldSubmitted,
       maxLengthEnforcement:
           widget.maxLength != null ? MaxLengthEnforcement.enforced : null,
       validator: (value) {
