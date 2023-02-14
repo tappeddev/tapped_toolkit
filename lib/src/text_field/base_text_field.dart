@@ -48,7 +48,10 @@ class BaseTextField extends StatefulWidget {
   /// Called when the user tap the "continue" button on the keyboard
   /// When there is no method provided (or the method/callback is null), the keyboard will be closed
   final VoidCallback? onEditingComplete;
+
   final bool obscureText;
+
+  final bool autocorrect;
 
   const BaseTextField({
     required this.text,
@@ -72,6 +75,7 @@ class BaseTextField extends StatefulWidget {
     this.onLeave,
     this.onEditingComplete,
     this.obscureText = false,
+    this.autocorrect = true,
     this.inputFormatter,
     Key? key,
   }) : super(key: key);
@@ -170,6 +174,7 @@ class BaseTextFieldState extends State<BaseTextField>
           ? widget.textStyleMutator!(style)
           : style,
       obscureText: widget.obscureText,
+      autocorrect: widget.autocorrect,
       focusNode: _focusNode,
       controller: _textEditingController,
       // use onChange instead of [TextEditingController.addListener]
