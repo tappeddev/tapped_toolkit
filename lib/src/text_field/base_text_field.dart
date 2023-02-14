@@ -53,6 +53,8 @@ class BaseTextField extends StatefulWidget {
 
   final bool autocorrect;
 
+  final bool enableSuggestions;
+
   /// Defines the state of the keyboard (uppercase or lowercase) when selecting the TextField
   final TextCapitalization textCapitalization;
 
@@ -80,6 +82,7 @@ class BaseTextField extends StatefulWidget {
     this.onEditingComplete,
     this.obscureText = false,
     this.autocorrect = true,
+    this.enableSuggestions = true,
     this.inputFormatter,
     Key? key,
   }) : super(key: key);
@@ -180,6 +183,7 @@ class BaseTextFieldState extends State<BaseTextField>
       textCapitalization: widget.textCapitalization,
       obscureText: widget.obscureText,
       autocorrect: widget.autocorrect,
+      enableSuggestions: widget.enableSuggestions,
       focusNode: _focusNode,
       controller: _textEditingController,
       // use onChange instead of [TextEditingController.addListener]
