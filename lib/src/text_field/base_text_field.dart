@@ -53,6 +53,9 @@ class BaseTextField extends StatefulWidget {
 
   final bool autocorrect;
 
+  /// Defines the state of the keyboard (uppercase or lowercase) when selecting the TextField
+  final TextCapitalization textCapitalization;
+
   const BaseTextField({
     required this.text,
     required this.onChanged,
@@ -61,6 +64,7 @@ class BaseTextField extends StatefulWidget {
     this.onFieldSubmitted,
     this.onValidationChanged,
     this.textInputType,
+    this.textCapitalization = TextCapitalization.none,
     this.focusNode,
     this.validator,
     this.textStyleMutator,
@@ -173,6 +177,7 @@ class BaseTextFieldState extends State<BaseTextField>
       style: widget.textStyleMutator != null
           ? widget.textStyleMutator!(style)
           : style,
+      textCapitalization: widget.textCapitalization,
       obscureText: widget.obscureText,
       autocorrect: widget.autocorrect,
       focusNode: _focusNode,
