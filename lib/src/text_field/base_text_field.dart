@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:after_first_build/after_first_build.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:tapped_toolkit/src/after_first_build/after_first_build_mixin.dart';
+import 'package:tapped_toolkit/src/after_first_build/on_next_frame_extension.dart';
 
 typedef TextStyleMutation = TextStyle Function(TextStyle style);
 
@@ -10,6 +11,7 @@ class BaseTextField extends StatefulWidget {
   final String text;
 
   final ValueChanged<String> onChanged;
+  final void Function(String value)? onFieldSubmitted;
   final String? Function(String? value)? validator;
   final TextStyle Function(TextStyle)? textStyleMutator;
   final TextStyle textStyle;
@@ -51,13 +53,20 @@ class BaseTextField extends StatefulWidget {
 
   final bool autocorrect;
 
+  final bool enableSuggestions;
+
+  /// Defines the state of the keyboard (uppercase or lowercase) when selecting the TextField
+  final TextCapitalization textCapitalization;
+
   const BaseTextField({
     required this.text,
     required this.onChanged,
     required this.decoration,
     required this.textStyle,
+    this.onFieldSubmitted,
     this.onValidationChanged,
     this.textInputType,
+    this.textCapitalization = TextCapitalization.none,
     this.focusNode,
     this.validator,
     this.textStyleMutator,
@@ -73,6 +82,7 @@ class BaseTextField extends StatefulWidget {
     this.onEditingComplete,
     this.obscureText = false,
     this.autocorrect = true,
+    this.enableSuggestions = true,
     this.inputFormatter,
     Key? key,
   }) : super(key: key);
@@ -84,6 +94,8 @@ class BaseTextField extends StatefulWidget {
 class BaseTextFieldState extends State<BaseTextField>
     with AfterFirstBuildMixin {
   late final _focusNode = widget.focusNode ?? FocusNode();
+
+  final _formFieldKey = GlobalKey<FormFieldState<String>>();
 
   late TextEditingController _textEditingController;
 
@@ -138,11 +150,13 @@ class BaseTextFieldState extends State<BaseTextField>
     final style = widget.textStyle;
 
     return TextFormField(
+      key: _formFieldKey,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
       maxLength: widget.maxLength,
       autofillHints: widget.autofillHints,
       inputFormatters: widget.inputFormatter,
+      onFieldSubmitted: widget.onFieldSubmitted,
       maxLengthEnforcement:
           widget.maxLength != null ? MaxLengthEnforcement.enforced : null,
       validator: (value) {
@@ -166,14 +180,23 @@ class BaseTextFieldState extends State<BaseTextField>
       style: widget.textStyleMutator != null
           ? widget.textStyleMutator!(style)
           : style,
+      textCapitalization: widget.textCapitalization,
       obscureText: widget.obscureText,
       autocorrect: widget.autocorrect,
+      enableSuggestions: widget.enableSuggestions,
       focusNode: _focusNode,
       controller: _textEditingController,
       // use onChange instead of [TextEditingController.addListener]
       // because this will notify a text change when we loose focus
       // when routing back. This will trigger a new search which is wrong.
-      onChanged: (string) => widget.onChanged(string),
+      onChanged: (string) {
+        // we always want to validate the new input when the current state is invalid
+        if (!_textFieldIsValid) {
+          _formFieldKey.currentState?.validate();
+        }
+
+        widget.onChanged(string);
+      },
       decoration: widget.decoration,
     );
   }
