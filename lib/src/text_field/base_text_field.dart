@@ -48,7 +48,15 @@ class BaseTextField extends StatefulWidget {
   /// Called when the user tap the "continue" button on the keyboard
   /// When there is no method provided (or the method/callback is null), the keyboard will be closed
   final VoidCallback? onEditingComplete;
+
   final bool obscureText;
+
+  final bool autocorrect;
+
+  final bool enableSuggestions;
+
+  /// Defines the state of the keyboard (uppercase or lowercase) when selecting the TextField
+  final TextCapitalization textCapitalization;
 
   const BaseTextField({
     required this.text,
@@ -58,6 +66,7 @@ class BaseTextField extends StatefulWidget {
     this.onFieldSubmitted,
     this.onValidationChanged,
     this.textInputType,
+    this.textCapitalization = TextCapitalization.none,
     this.focusNode,
     this.validator,
     this.textStyleMutator,
@@ -72,6 +81,8 @@ class BaseTextField extends StatefulWidget {
     this.onLeave,
     this.onEditingComplete,
     this.obscureText = false,
+    this.autocorrect = true,
+    this.enableSuggestions = true,
     this.inputFormatter,
     Key? key,
   }) : super(key: key);
@@ -169,7 +180,10 @@ class BaseTextFieldState extends State<BaseTextField>
       style: widget.textStyleMutator != null
           ? widget.textStyleMutator!(style)
           : style,
+      textCapitalization: widget.textCapitalization,
       obscureText: widget.obscureText,
+      autocorrect: widget.autocorrect,
+      enableSuggestions: widget.enableSuggestions,
       focusNode: _focusNode,
       controller: _textEditingController,
       // use onChange instead of [TextEditingController.addListener]
