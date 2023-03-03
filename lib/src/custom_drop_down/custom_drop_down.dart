@@ -258,7 +258,7 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
                 widget.onChanged(selectedValue as T);
               },
               border: Border(
-                top: i > 0
+                top: i > 0 || widget.items.length == 1
                     ? BorderSide(color: widget.borderColor)
                     : BorderSide.none,
                 left: BorderSide(color: widget.borderColor),
