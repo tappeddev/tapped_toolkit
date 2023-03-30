@@ -151,6 +151,7 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
     required Border? border,
   }) {
     return AnimatedContainer(
+      key: item.key,
       height: widget.itemHeight,
       duration: const Duration(milliseconds: 180),
       decoration: BoxDecoration(
