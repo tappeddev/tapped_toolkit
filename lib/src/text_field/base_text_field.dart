@@ -35,6 +35,8 @@ class BaseTextField extends StatefulWidget {
 
   final FocusNode? focusNode;
 
+  final bool expands;
+
   /// Returns if the TextField is valid or contains an error
   final ValueChanged<bool>? onValidationChanged;
 
@@ -68,6 +70,7 @@ class BaseTextField extends StatefulWidget {
     this.textInputType,
     this.textCapitalization = TextCapitalization.none,
     this.focusNode,
+    this.expands = false,
     this.validator,
     this.textStyleMutator,
     this.maxLength,
@@ -157,6 +160,7 @@ class BaseTextFieldState extends State<BaseTextField>
       autofillHints: widget.autofillHints,
       inputFormatters: widget.inputFormatter,
       onFieldSubmitted: widget.onFieldSubmitted,
+      expands: widget.expands,
       maxLengthEnforcement:
           widget.maxLength != null ? MaxLengthEnforcement.enforced : null,
       validator: (value) {
