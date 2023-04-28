@@ -18,9 +18,8 @@ class BaseTextField extends StatefulWidget {
   final bool autoValidate;
   final bool autofocus;
 
-  final int minLines;
-  final int maxLines;
-
+  final int? minLines;
+  final int? maxLines;
   final int? maxLength;
 
   final TextInputType? textInputType;
