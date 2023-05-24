@@ -1,3 +1,4 @@
+import 'package:example/base_text_field_example/base_text_field_example.dart';
 import 'package:example/custom_drop_down_example/custom_drop_down_example.dart';
 import 'package:flutter/material.dart';
 
@@ -17,8 +18,14 @@ class ExampleApp extends StatelessWidget {
             appBar: AppBar(),
             body: Container(
               padding: const EdgeInsets.all(10.0),
-              child: const DropDownExample(
-                numberOfEntries: 25,
+              child: Column(
+                children: const [
+                  BaseTextFieldExample(),
+                  SizedBox(height: 25),
+                  DropDownExample(
+                    numberOfEntries: 25,
+                  ),
+                ],
               ),
             ),
           );
