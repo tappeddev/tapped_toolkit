@@ -108,8 +108,9 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
                 child: _buildItem(
                   onTap: _toggleDropdown,
                   border: Border.all(
-                    color:
-                        state.hasError ? theme.errorColor : widget.borderColor,
+                    color: state.hasError
+                        ? theme.colorScheme.error
+                        : widget.borderColor,
                   ),
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(widget.cornerRadius),
@@ -133,8 +134,8 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
                   state.errorText ?? "",
                   style: widget.errorStyle ??
                       effectiveDecoration.errorStyle ??
-                      theme.textTheme.caption!
-                          .copyWith(color: theme.errorColor),
+                      theme.textTheme.bodySmall!
+                          .copyWith(color: theme.colorScheme.error),
                 ),
               ),
           ],
@@ -188,8 +189,7 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
     final maximumAvailableHeight =
         mediaQuery.size.height - offset.dy - mediaQuery.viewPadding.vertical;
 
-    // Ensure we have at least half an entry space to the bottom
-    final topOffset = offset.dy + 1.5 * widget.itemHeight;
+    final topOffset = offset.dy + widget.itemHeight + mediaQuery.padding.bottom;
 
     return OverlayEntry(
       builder: (context) {
