@@ -10,10 +10,10 @@ class DropDownExample extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<DropDownExample> createState() => _DropDownExample();
+  State<DropDownExample> createState() => _DropDownExampleState();
 }
 
-class _DropDownExample extends State<DropDownExample> {
+class _DropDownExampleState extends State<DropDownExample> {
   int _index = 0;
 
   @override
