@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:non_uniform_border/non_uniform_border.dart';
 import 'package:tapped_toolkit/src/after_first_build/on_next_frame_extension.dart';
 
 class CustomDropDown<T> extends StatefulWidget {
@@ -107,8 +108,9 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
                 child: _buildItem(
                   onTap: _toggleDropdown,
                   border: Border.all(
-                    color:
-                        state.hasError ? theme.errorColor : widget.borderColor,
+                    color: state.hasError
+                        ? theme.colorScheme.error
+                        : widget.borderColor,
                   ),
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(widget.cornerRadius),
@@ -132,8 +134,8 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
                   state.errorText ?? "",
                   style: widget.errorStyle ??
                       effectiveDecoration.errorStyle ??
-                      theme.textTheme.caption!
-                          .copyWith(color: theme.errorColor),
+                      theme.textTheme.bodySmall!
+                          .copyWith(color: theme.colorScheme.error),
                 ),
               ),
           ],
@@ -187,7 +189,8 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
     final maximumAvailableHeight =
         mediaQuery.size.height - offset.dy - mediaQuery.viewPadding.vertical;
 
-    final topOffset = offset.dy;
+    final topOffset = offset.dy + widget.itemHeight + mediaQuery.padding.bottom;
+
     return OverlayEntry(
       builder: (context) {
         final expandAnimation = CurvedAnimation(
@@ -240,8 +243,22 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
   }) {
     final shouldScroll = neededHeight > maximumAvailableHeight;
 
-    return Container(
-      constraints: BoxConstraints(maxHeight: maximumAvailableHeight),
+    final borderSide = BorderSide(color: widget.borderColor);
+    final radius = Radius.circular(widget.cornerRadius);
+
+    return Material(
+      clipBehavior: Clip.hardEdge,
+      shape: NonUniformBorder(
+        borderRadius: BorderRadius.only(
+          bottomLeft: radius,
+          bottomRight: radius,
+        ),
+        topWidth: 0,
+        color: borderSide.color,
+        bottomWidth: borderSide.width,
+        leftWidth: borderSide.width,
+        rightWidth: borderSide.width,
+      ),
       child: ListView(
         padding: EdgeInsets.zero,
         shrinkWrap: true,
@@ -260,17 +277,16 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
               },
               border: Border(
                 top: i > 0 || widget.items.length == 1
-                    ? BorderSide(color: widget.borderColor)
+                    ? borderSide
                     : BorderSide.none,
-                left: BorderSide(color: widget.borderColor),
-                right: BorderSide(color: widget.borderColor),
-                bottom: i == widget.items.length - 1
-                    ? BorderSide(color: widget.borderColor)
-                    : BorderSide.none,
+                left: borderSide,
+                right: borderSide,
+                bottom:
+                    i == widget.items.length - 1 ? borderSide : BorderSide.none,
               ),
               borderRadius: i == widget.items.length - 1
                   ? BorderRadius.vertical(
-                      bottom: Radius.circular(widget.cornerRadius),
+                      bottom: radius,
                     )
                   : null,
               item: widget.items[i],
@@ -309,14 +325,14 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
       setState(() => _isOpen = false);
     } else {
       _overlayEntry = _createOverlayEntry();
-      Overlay.of(context)!.insert(_overlayEntry!);
+      Overlay.of(context).insert(_overlayEntry!);
       setState(() => _isOpen = true);
       await _animationController.forward();
     }
   }
 }
 
-/// A simple data class that holds all the data of on item.
+/// A simple data class that holds all the data of an item.
 class CustomDropDownItem<T> {
   /// The value of the item or null if the item
   /// is returned in [CustomDropDown.buildButton].
