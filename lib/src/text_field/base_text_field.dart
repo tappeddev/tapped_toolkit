@@ -211,6 +211,10 @@ class BaseTextFieldState extends State<BaseTextField>
     final text = widget.text;
 
     if (oldWidget.text != text) {
+      // We don't need anything whenever the change is from the textfield itself
+      if (_textEditingController.text == text) return;
+
+      // this will be called, whenever a change comes from outside and we need to handle the changed event
       onNextFrame(() {
         if (text.isEmpty) {
           _textEditingController.clear();

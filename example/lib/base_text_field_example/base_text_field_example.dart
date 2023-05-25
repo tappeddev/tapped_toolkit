@@ -9,11 +9,15 @@ class BaseTextFieldExample extends StatefulWidget {
 }
 
 class _BaseTextFieldExampleState extends State<BaseTextFieldExample> {
+  var _text = "";
+
   @override
   Widget build(BuildContext context) {
     return BaseTextField(
-      text: "0000",
-      onChanged: (value) {},
+      text: _text,
+      onChanged: (value) {
+        setState(() => _text = value);
+      },
       decoration: const InputDecoration(label: Text("Enter some text")),
       textStyle: const TextStyle(),
     );
