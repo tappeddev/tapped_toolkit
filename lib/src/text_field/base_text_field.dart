@@ -236,6 +236,10 @@ class BaseTextFieldState extends State<BaseTextField>
     }
   }
 
+  void validate() {
+    _formFieldKey.currentState?.validate();
+  }
+
   @override
   void dispose() {
     // We only need to dispose the FocusNode by ourself
