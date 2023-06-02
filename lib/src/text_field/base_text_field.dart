@@ -130,14 +130,7 @@ class BaseTextFieldState extends State<BaseTextField>
       _textEditingController = TextEditingController();
     }
 
-    _focusNode.addListener(() {
-      setState(() {});
-      widget.onFocusChanged?.call(_focusNode.hasFocus);
-
-      if (!_focusNode.hasFocus) {
-        widget.onLeave?.call();
-      }
-    });
+    _focusNode.addListener(_addFocusNodeListener);
   }
 
   @override
@@ -240,8 +233,18 @@ class BaseTextFieldState extends State<BaseTextField>
     _formFieldKey.currentState?.validate();
   }
 
+  void _addFocusNodeListener() {
+    widget.onFocusChanged?.call(_focusNode.hasFocus);
+
+    if (!_focusNode.hasFocus) {
+      widget.onLeave?.call();
+    }
+  }
+
   @override
   void dispose() {
+    _focusNode.removeListener(_addFocusNodeListener);
+
     // We only need to dispose the FocusNode by ourself
     // when we create the FocusNode by ourself.
     if (widget.focusNode == null) {
