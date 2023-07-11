@@ -218,7 +218,7 @@ class BaseTextFieldState extends State<BaseTextField>
           _textEditingController.value = _textEditingController.value.copyWith(
             text: text,
             selection: isNewTextSmaller
-                ? selection
+                ? TextSelection.collapsed(offset: text.length)
                 : selection.copyWith(
                     baseOffset: text.length,
                     extentOffset: text.length,
