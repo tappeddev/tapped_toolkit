@@ -59,6 +59,8 @@ class BaseTextField extends StatefulWidget {
   /// Defines the state of the keyboard (uppercase or lowercase) when selecting the TextField
   final TextCapitalization textCapitalization;
 
+  final TextAlignVertical textAlignVertical;
+
   const BaseTextField({
     required this.text,
     required this.onChanged,
@@ -86,6 +88,7 @@ class BaseTextField extends StatefulWidget {
     this.autocorrect = true,
     this.enableSuggestions = true,
     this.inputFormatter,
+    this.textAlignVertical = TextAlignVertical.center,
     Key? key,
   }) : super(key: key);
 
@@ -146,6 +149,7 @@ class BaseTextFieldState extends State<BaseTextField>
 
     return TextFormField(
       key: _formFieldKey,
+      textAlignVertical: widget.textAlignVertical,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
       maxLength: widget.maxLength,
