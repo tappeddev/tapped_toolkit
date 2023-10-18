@@ -60,6 +60,7 @@ class BaseTextField extends StatefulWidget {
   final TextCapitalization textCapitalization;
 
   final TextAlignVertical textAlignVertical;
+  final bool? cursorOpacityAnimates;
 
   final bool readOnly;
 
@@ -92,6 +93,7 @@ class BaseTextField extends StatefulWidget {
     this.inputFormatter,
     this.textAlignVertical = TextAlignVertical.center,
     this.readOnly = false,
+    this.cursorOpacityAnimates,
     Key? key,
   }) : super(key: key);
 
@@ -160,6 +162,7 @@ class BaseTextFieldState extends State<BaseTextField>
       autofillHints: widget.autofillHints,
       inputFormatters: widget.inputFormatter,
       onFieldSubmitted: widget.onFieldSubmitted,
+      cursorOpacityAnimates: widget.cursorOpacityAnimates,
       expands: widget.expands,
       maxLengthEnforcement:
           widget.maxLength != null ? MaxLengthEnforcement.enforced : null,
