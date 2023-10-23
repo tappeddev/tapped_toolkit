@@ -61,6 +61,8 @@ class BaseTextField extends StatefulWidget {
 
   final TextAlignVertical textAlignVertical;
 
+  final bool readOnly;
+
   const BaseTextField({
     required this.text,
     required this.onChanged,
@@ -89,6 +91,7 @@ class BaseTextField extends StatefulWidget {
     this.enableSuggestions = true,
     this.inputFormatter,
     this.textAlignVertical = TextAlignVertical.center,
+    this.readOnly = false,
     Key? key,
   }) : super(key: key);
 
@@ -150,6 +153,7 @@ class BaseTextFieldState extends State<BaseTextField>
     return TextFormField(
       key: _formFieldKey,
       textAlignVertical: widget.textAlignVertical,
+      readOnly: widget.readOnly,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
       maxLength: widget.maxLength,
