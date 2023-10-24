@@ -63,6 +63,8 @@ class BaseTextField extends StatefulWidget {
 
   final bool readOnly;
 
+  final VoidCallback? onTap;
+
   const BaseTextField({
     required this.text,
     required this.onChanged,
@@ -92,6 +94,7 @@ class BaseTextField extends StatefulWidget {
     this.inputFormatter,
     this.textAlignVertical = TextAlignVertical.center,
     this.readOnly = false,
+    this.onTap,
     Key? key,
   }) : super(key: key);
 
@@ -153,7 +156,7 @@ class BaseTextFieldState extends State<BaseTextField>
     return TextFormField(
       key: _formFieldKey,
       textAlignVertical: widget.textAlignVertical,
-      readOnly: widget.readOnly,
+      readOnly: widget.readOnly || widget.onTap != null,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
       maxLength: widget.maxLength,
@@ -161,6 +164,7 @@ class BaseTextFieldState extends State<BaseTextField>
       inputFormatters: widget.inputFormatter,
       onFieldSubmitted: widget.onFieldSubmitted,
       expands: widget.expands,
+      onTap: widget.onTap,
       maxLengthEnforcement:
           widget.maxLength != null ? MaxLengthEnforcement.enforced : null,
       validator: (value) {
