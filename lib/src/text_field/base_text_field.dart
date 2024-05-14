@@ -141,6 +141,9 @@ class BaseTextFieldState extends State<BaseTextField>
       _textEditingController = TextEditingController();
     }
 
+    _textEditingController
+        .addListener(() => _onChanged(_textEditingController.text));
+
     _focusNode.addListener(_addFocusNodeListener);
   }
 
@@ -197,17 +200,6 @@ class BaseTextFieldState extends State<BaseTextField>
       enableSuggestions: widget.enableSuggestions,
       focusNode: _focusNode,
       controller: _textEditingController,
-      // use onChange instead of [TextEditingController.addListener]
-      // because this will notify a text change when we loose focus
-      // when routing back. This will trigger a new search which is wrong.
-      onChanged: (string) {
-        // we always want to validate the new input when the current state is invalid
-        if (!_textFieldIsValid) {
-          _formFieldKey.currentState?.validate();
-        }
-
-        widget.onChanged(string);
-      },
       decoration: widget.decoration,
     );
   }
@@ -246,6 +238,15 @@ class BaseTextFieldState extends State<BaseTextField>
 
   void validate() {
     _formFieldKey.currentState?.validate();
+  }
+
+  void _onChanged(String value) {
+    // we always want to validate the new input when the current state is invalid
+    if (!_textFieldIsValid) {
+      _formFieldKey.currentState?.validate();
+    }
+
+    widget.onChanged(value);
   }
 
   void _addFocusNodeListener() {
