@@ -118,6 +118,15 @@ class BaseTextFieldState extends State<BaseTextField>
   @visibleForTesting
   FocusNode get focusNode => _focusNode;
 
+  // We previous used the onChange event from the [TextFormField], since adding a listener to the [TextEditingController] is also called
+  // when we focus / unfocus the [TextFormField].
+  // 💾 This was the previous documentation:
+  // 💾 use onChange instead of [TextEditingController.addListener]
+  // 💾 because this will notify a text change when we loose focus
+  // 💾 when routing back. This will trigger a new search which is wrong.
+  // Since we now use the listener, we need to distinct the value by ourself.
+  late String _previousTextValue = widget.text;
+
   bool _textFieldIsValid = true;
 
   @override
@@ -140,6 +149,9 @@ class BaseTextFieldState extends State<BaseTextField>
     } else {
       _textEditingController = TextEditingController();
     }
+
+    _textEditingController
+        .addListener(() => _onChanged(_textEditingController.text));
 
     _focusNode.addListener(_addFocusNodeListener);
   }
@@ -197,17 +209,6 @@ class BaseTextFieldState extends State<BaseTextField>
       enableSuggestions: widget.enableSuggestions,
       focusNode: _focusNode,
       controller: _textEditingController,
-      // use onChange instead of [TextEditingController.addListener]
-      // because this will notify a text change when we loose focus
-      // when routing back. This will trigger a new search which is wrong.
-      onChanged: (string) {
-        // we always want to validate the new input when the current state is invalid
-        if (!_textFieldIsValid) {
-          _formFieldKey.currentState?.validate();
-        }
-
-        widget.onChanged(string);
-      },
       decoration: widget.decoration,
     );
   }
@@ -246,6 +247,19 @@ class BaseTextFieldState extends State<BaseTextField>
 
   void validate() {
     _formFieldKey.currentState?.validate();
+  }
+
+  void _onChanged(String value) {
+    if (_previousTextValue == value) return;
+
+    _previousTextValue = value;
+
+    // we always want to validate the new input when the current state is invalid
+    if (!_textFieldIsValid) {
+      _formFieldKey.currentState?.validate();
+    }
+
+    widget.onChanged(value);
   }
 
   void _addFocusNodeListener() {
