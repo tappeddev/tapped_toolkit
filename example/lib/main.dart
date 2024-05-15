@@ -30,7 +30,7 @@ class _ExampleAppState extends State<ExampleApp> {
                 children: [
                   BaseTextField(
                     text: _text,
-                    onChanged: (value) {
+                    onChanged: (value, source) {
                       setState(() => _text = value);
                     },
                     decoration:
