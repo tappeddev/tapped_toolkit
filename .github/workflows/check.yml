@@ -13,13 +13,9 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v3
-    - uses: kuhnroyal/flutter-fvm-config-action@v1
-      with:
-        path: '.fvm/fvm_config.json'
+    - uses: kuhnroyal/flutter-fvm-config-action@v2
+      id: fvm-config-action
     - uses: subosito/flutter-action@v2
-      with:
-        flutter-version: ${{ env.FLUTTER_VERSION }}
-        channel: ${{ env.FLUTTER_CHANNEL }}
     - name: Get all dependencies
       run: flutter pub get
     - name: analyze app
@@ -30,13 +26,9 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v3
-    - uses: kuhnroyal/flutter-fvm-config-action@v1
-      with:
-        path: '.fvm/fvm_config.json'
+    - uses: kuhnroyal/flutter-fvm-config-action@v2
+      id: fvm-config-action
     - uses: subosito/flutter-action@v2
-      with:
-        flutter-version: ${{ env.FLUTTER_VERSION }}
-        channel: ${{ env.FLUTTER_CHANNEL }}
     - name: Get all dependencies
       run: flutter pub get
     - name: Check formatting
@@ -47,13 +39,9 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v3
-      - uses: kuhnroyal/flutter-fvm-config-action@v1
-        with:
-          path: '.fvm/fvm_config.json'
+      - uses: kuhnroyal/flutter-fvm-config-action@v2
+        id: fvm-config-action
       - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: ${{ env.FLUTTER_CHANNEL }}
       - name: Get all dependencies
         run: flutter pub get
       - name: Check formatting
