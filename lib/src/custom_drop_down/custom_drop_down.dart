@@ -291,7 +291,7 @@ class CustomDropDownState<T> extends State<CustomDropDown<T>>
                   : null,
               item: widget.items[i],
             ),
-          ]
+          ],
         ],
       ),
     );
