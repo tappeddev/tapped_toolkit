@@ -37,7 +37,8 @@ class _ExampleAppState extends State<ExampleApp> {
                       onChanged: (value) {
                         setState(() => _text = value);
                       },
-                      decoration: const InputDecoration(label: Text("Enter some text")),
+                      decoration:
+                          const InputDecoration(label: Text("Enter some text")),
                       textStyle: const TextStyle(),
                       validator: (input) {
                         if (input == null || input.isEmpty) {
