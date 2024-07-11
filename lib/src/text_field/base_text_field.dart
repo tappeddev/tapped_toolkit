@@ -262,7 +262,10 @@ class BaseTextFieldState extends State<BaseTextField>
 
     _previousTextValue = value;
 
-    widget.onChanged(value);
+    widget.onChanged(
+      value,
+      value == widget.text ? TextFieldSource.outside : TextFieldSource.inside,
+    );
 
     // we need to wait until the next microtask
     await Future<void>.delayed(const Duration());
@@ -272,11 +275,6 @@ class BaseTextFieldState extends State<BaseTextField>
     if (!_textFieldIsValid) {
       _formFieldKey.currentState?.validate();
     }
-
-    widget.onChanged(
-      value,
-      value == widget.text ? TextFieldSource.outside : TextFieldSource.inside,
-    );
   }
 
   void _addFocusNodeListener() {
