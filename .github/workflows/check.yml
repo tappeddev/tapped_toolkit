@@ -42,7 +42,7 @@ jobs:
 
   test:
     timeout-minutes: 5
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - uses: kuhnroyal/flutter-fvm-config-action@v2
@@ -53,5 +53,5 @@ jobs:
           channel: ${{ env.FLUTTER_CHANNEL }}
       - name: Get all dependencies
         run: flutter pub get
-      - name: Check formatting
+      - name: run tests
         run: flutter test
