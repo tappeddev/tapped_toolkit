@@ -16,6 +16,8 @@ class ExampleApp extends StatefulWidget {
 class _ExampleAppState extends State<ExampleApp> {
   var _text = "";
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,33 +27,51 @@ class _ExampleAppState extends State<ExampleApp> {
             appBar: AppBar(),
             body: Container(
               padding: const EdgeInsets.all(10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  BaseTextField(
-                    text: _text,
-                    onChanged: (value) {
-                      setState(() => _text = value);
-                    },
-                    decoration:
-                        const InputDecoration(label: Text("Enter some text")),
-                    textStyle: const TextStyle(),
-                  ),
-                  const SizedBox(height: 25),
-                  MaterialButton(
-                    onPressed: () {
-                      setState(() => _text = "This is a really long text...");
-                    },
-                    child: const Text("Add large text"),
-                  ),
-                  MaterialButton(
-                    onPressed: () {
-                      setState(() => _text = "Short text.");
-                    },
-                    child: const Text("Add small text"),
-                  ),
-                  const DropDownExample(numberOfEntries: 25),
-                ],
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    BaseTextField(
+                      text: _text,
+                      onChanged: (value) {
+                        setState(() => _text = value);
+                      },
+                      decoration: const InputDecoration(label: Text("Enter some text")),
+                      textStyle: const TextStyle(),
+                      validator: (input) {
+                        if (input == null || input.isEmpty) {
+                          return "Enter something";
+                        }
+                        if (input.length < 6) {
+                          return "Input is too short";
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () {
+                        _formKey.currentState?.validate();
+                      },
+                      child: const Text("Validate textfield"),
+                    ),
+                    const SizedBox(height: 25),
+                    MaterialButton(
+                      onPressed: () {
+                        setState(() => _text = "This is a really long text...");
+                      },
+                      child: const Text("Add large text"),
+                    ),
+                    MaterialButton(
+                      onPressed: () {
+                        setState(() => _text = "Short text.");
+                      },
+                      child: const Text("Add small text"),
+                    ),
+                    const DropDownExample(numberOfEntries: 25),
+                  ],
+                ),
               ),
             ),
           );
