@@ -249,17 +249,22 @@ class BaseTextFieldState extends State<BaseTextField>
     _formFieldKey.currentState?.validate();
   }
 
-  void _onChanged(String value) {
+  // ignore: avoid_void_async
+  void _onChanged(String value) async {
     if (_previousTextValue == value) return;
 
     _previousTextValue = value;
 
+    widget.onChanged(value);
+
+    // we need to wait until the next microtask
+    await Future<void>.delayed(const Duration());
+
+    // ⚠️ validate after the new input is attached
     // we always want to validate the new input when the current state is invalid
     if (!_textFieldIsValid) {
       _formFieldKey.currentState?.validate();
     }
-
-    widget.onChanged(value);
   }
 
   void _addFocusNodeListener() {
