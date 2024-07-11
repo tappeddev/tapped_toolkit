@@ -5,12 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:tapped_toolkit/src/after_first_build/after_first_build_mixin.dart';
 import 'package:tapped_toolkit/src/after_first_build/on_next_frame_extension.dart';
 
+enum TextFieldSource { inside, outside }
+
 typedef TextStyleMutation = TextStyle Function(TextStyle style);
 
 class BaseTextField extends StatefulWidget {
   final String text;
 
-  final ValueChanged<String> onChanged;
+  final void Function(String value, TextFieldSource source) onChanged;
   final void Function(String value)? onFieldSubmitted;
   final String? Function(String? value)? validator;
   final TextStyle Function(TextStyle)? textStyleMutator;
@@ -125,13 +127,18 @@ class BaseTextFieldState extends State<BaseTextField>
   // 💾 because this will notify a text change when we loose focus
   // 💾 when routing back. This will trigger a new search which is wrong.
   // Since we now use the listener, we need to distinct the value by ourself.
-  late String _previousTextValue = widget.text;
+  late String _previousTextValue;
 
   bool _textFieldIsValid = true;
 
   @override
   void initState() {
     super.initState();
+
+    // We need to do it like that, otherwise we initialize is to late
+    // and the initial value is not correct.
+    _previousTextValue = widget.text;
+
     // We need to avoid to add a empty text into the constructor since the [_textEditingController.addListener] callback is triggered on an empty string
     if (widget.text.replaceAll(" ", "").isNotEmpty) {
       final text = widget.text;
@@ -265,6 +272,11 @@ class BaseTextFieldState extends State<BaseTextField>
     if (!_textFieldIsValid) {
       _formFieldKey.currentState?.validate();
     }
+
+    widget.onChanged(
+      value,
+      value == widget.text ? TextFieldSource.outside : TextFieldSource.inside,
+    );
   }
 
   void _addFocusNodeListener() {
