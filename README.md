@@ -4,7 +4,7 @@ This repository is a collection of packages and best practices.
 
 ### App Setup Guide
 
-We like to keep our dependencies to a minimum and make as much use of the libraryies or packages that we install.
+We like to keep our dependencies to a minimum and make as much use of the libraries or packages that we install.
 This guide will walk you through some of the packages and explain why we are using them.
 
 #### 1. Flutter version manager
@@ -31,7 +31,7 @@ Please ensure that the sdk is set up correctly by calling `fvm flutter doctor`
 
 #### 2. State managment
 
-We use [Riverpod](https://riverpod.dev/) for state managment.
+We use [Riverpod](https://riverpod.dev/) for state management.
 Riverpods provides all the tools we need to build different kinds of architectures for
 different apps in a simple way.
 
@@ -42,7 +42,7 @@ dependency injection.
 We can override providers when creating a `ProviderContainer` and this gives us the ability to mock certain providers
 in a test.
 
-We might setup our provider strucutre like this:
+We might setup our provider structure like this:
 
 ```dart
 // Here we have a simple service that is wrapped in a provider.
@@ -85,7 +85,7 @@ It can be executed in the project directory by using `fvm flutter analyze`.
 ##### 2. Format
 
 It's important to have a consistent formatting in every file. Especially widgets have bigger build methods that
-suffer from readbility when reading changes in a diff.
+suffer from readability when reading changes in a diff.
 Keeping a consistent formatting helps reading diffs and avoids arguing about code style.
 Running the formatter in the pipeline can be done by executing `fvm flutter format --set-exit-if-changed`.
 
