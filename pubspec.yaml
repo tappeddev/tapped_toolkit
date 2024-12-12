@@ -9,6 +9,8 @@ environment:
 
 dependencies:
   non_uniform_border: ^1.0.0
+  # for the platform check
+  universal_platform: ^1.1.0
   collection: ^1.16.0
   flutter:
     sdk: flutter
@@ -21,5 +23,3 @@ dev_dependencies:
     git:
       url: https://github.com/tappeddev/tapped_lints.git
       ref: master
-
-flutter:

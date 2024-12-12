@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tapped_toolkit/src/after_first_build/after_first_build_mixin.dart';
 import 'package:tapped_toolkit/src/after_first_build/on_next_frame_extension.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 enum TextFieldSource { inside, outside }
 
@@ -117,6 +118,8 @@ class BaseTextFieldState extends State<BaseTextField>
   @visibleForTesting
   TextEditingController get textEditingController => _textEditingController;
 
+  final _selectableRegionFocusNode = FocusNode();
+
   @visibleForTesting
   FocusNode get focusNode => _focusNode;
 
@@ -160,6 +163,14 @@ class BaseTextFieldState extends State<BaseTextField>
     _textEditingController
         .addListener(() => _onChanged(_textEditingController.text));
 
+    if (UniversalPlatform.isWeb) {
+      _selectableRegionFocusNode.addListener(() {
+        if (_selectableRegionFocusNode.hasPrimaryFocus) {
+          _focusNode.requestFocus();
+        }
+      });
+    }
+
     _focusNode.addListener(_addFocusNodeListener);
   }
 
@@ -174,7 +185,7 @@ class BaseTextFieldState extends State<BaseTextField>
   Widget build(BuildContext context) {
     final style = widget.textStyle;
 
-    return TextFormField(
+    final textField = TextFormField(
       key: _formFieldKey,
       textAlignVertical: widget.textAlignVertical,
       readOnly: widget.readOnly || widget.onTap != null,
@@ -218,6 +229,17 @@ class BaseTextFieldState extends State<BaseTextField>
       controller: _textEditingController,
       decoration: widget.decoration,
     );
+
+    if (UniversalPlatform.isWeb) {
+      // ⚠️ We added the [SelectionArea], since we had an issue with the text filed in the web ->  https://github.com/flutter/flutter/issues/158095
+      return SelectableRegion(
+        focusNode: _selectableRegionFocusNode,
+        selectionControls: emptyTextSelectionControls,
+        child: textField,
+      );
+    }
+
+    return textField;
   }
 
   @override
@@ -294,6 +316,8 @@ class BaseTextFieldState extends State<BaseTextField>
     if (widget.focusNode == null) {
       _focusNode.dispose();
     }
+
+    _selectableRegionFocusNode.dispose();
     _textEditingController.dispose();
     super.dispose();
   }
