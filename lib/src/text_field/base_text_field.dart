@@ -107,7 +107,8 @@ class BaseTextField extends StatefulWidget {
   BaseTextFieldState createState() => BaseTextFieldState();
 }
 
-class BaseTextFieldState extends State<BaseTextField> with AfterFirstBuildMixin {
+class BaseTextFieldState extends State<BaseTextField>
+    with AfterFirstBuildMixin {
   late final _focusNode = widget.focusNode ?? FocusNode();
 
   final _formFieldKey = GlobalKey<FormFieldState<String>>();
@@ -152,13 +153,15 @@ class BaseTextFieldState extends State<BaseTextField> with AfterFirstBuildMixin 
         // FROM: https://stackoverflow.com/questions/56851701/how-to-set-cursor-position-at-the-end-of-the-value-in-flutter-in-textfield
         final selection = TextSelection.collapsed(offset: text.length);
 
-        _textEditingController.value = _textEditingController.value.copyWith(text: text, selection: selection);
+        _textEditingController.value = _textEditingController.value
+            .copyWith(text: text, selection: selection);
       });
     } else {
       _textEditingController = TextEditingController();
     }
 
-    _textEditingController.addListener(() => _onChanged(_textEditingController.text));
+    _textEditingController
+        .addListener(() => _onChanged(_textEditingController.text));
 
     if (UniversalPlatform.isWeb) {
       _selectableRegionFocusNode.addListener(() {
@@ -195,23 +198,29 @@ class BaseTextFieldState extends State<BaseTextField> with AfterFirstBuildMixin 
       cursorOpacityAnimates: widget.cursorOpacityAnimates,
       expands: widget.expands,
       onTap: widget.onTap,
-      maxLengthEnforcement: widget.maxLength != null ? MaxLengthEnforcement.enforced : null,
+      maxLengthEnforcement:
+          widget.maxLength != null ? MaxLengthEnforcement.enforced : null,
       validator: (value) {
         final validationValue = widget.validator?.call(value);
 
         final isTextFieldValid = validationValue == null;
-        if (widget.onValidationChanged != null && isTextFieldValid != _textFieldIsValid) {
+        if (widget.onValidationChanged != null &&
+            isTextFieldValid != _textFieldIsValid) {
           onNextFrame(() => widget.onValidationChanged!(isTextFieldValid));
         }
 
         _textFieldIsValid = validationValue == null;
         return validationValue;
       },
-      autovalidateMode: widget.autoValidate ? AutovalidateMode.always : AutovalidateMode.disabled,
+      autovalidateMode: widget.autoValidate
+          ? AutovalidateMode.always
+          : AutovalidateMode.disabled,
       textInputAction: widget.textInputAction,
       onEditingComplete: widget.onEditingComplete,
       keyboardType: widget.textInputType,
-      style: widget.textStyleMutator != null ? widget.textStyleMutator!(style) : style,
+      style: widget.textStyleMutator != null
+          ? widget.textStyleMutator!(style)
+          : style,
       textCapitalization: widget.textCapitalization,
       obscureText: widget.obscureText,
       autocorrect: widget.autocorrect,
