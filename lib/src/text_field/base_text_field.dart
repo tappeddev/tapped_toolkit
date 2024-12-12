@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tapped_toolkit/src/after_first_build/after_first_build_mixin.dart';
 import 'package:tapped_toolkit/src/after_first_build/on_next_frame_extension.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 enum TextFieldSource { inside, outside }
 
@@ -106,8 +107,7 @@ class BaseTextField extends StatefulWidget {
   BaseTextFieldState createState() => BaseTextFieldState();
 }
 
-class BaseTextFieldState extends State<BaseTextField>
-    with AfterFirstBuildMixin {
+class BaseTextFieldState extends State<BaseTextField> with AfterFirstBuildMixin {
   late final _focusNode = widget.focusNode ?? FocusNode();
 
   final _formFieldKey = GlobalKey<FormFieldState<String>>();
@@ -116,6 +116,8 @@ class BaseTextFieldState extends State<BaseTextField>
 
   @visibleForTesting
   TextEditingController get textEditingController => _textEditingController;
+
+  final _selectableRegionFocusNode = FocusNode();
 
   @visibleForTesting
   FocusNode get focusNode => _focusNode;
@@ -150,15 +152,21 @@ class BaseTextFieldState extends State<BaseTextField>
         // FROM: https://stackoverflow.com/questions/56851701/how-to-set-cursor-position-at-the-end-of-the-value-in-flutter-in-textfield
         final selection = TextSelection.collapsed(offset: text.length);
 
-        _textEditingController.value = _textEditingController.value
-            .copyWith(text: text, selection: selection);
+        _textEditingController.value = _textEditingController.value.copyWith(text: text, selection: selection);
       });
     } else {
       _textEditingController = TextEditingController();
     }
 
-    _textEditingController
-        .addListener(() => _onChanged(_textEditingController.text));
+    _textEditingController.addListener(() => _onChanged(_textEditingController.text));
+
+    if (UniversalPlatform.isWeb) {
+      _selectableRegionFocusNode.addListener(() {
+        if (_selectableRegionFocusNode.hasPrimaryFocus) {
+          _focusNode.requestFocus();
+        }
+      });
+    }
 
     _focusNode.addListener(_addFocusNodeListener);
   }
@@ -174,7 +182,7 @@ class BaseTextFieldState extends State<BaseTextField>
   Widget build(BuildContext context) {
     final style = widget.textStyle;
 
-    return TextFormField(
+    final textField = TextFormField(
       key: _formFieldKey,
       textAlignVertical: widget.textAlignVertical,
       readOnly: widget.readOnly || widget.onTap != null,
@@ -187,29 +195,23 @@ class BaseTextFieldState extends State<BaseTextField>
       cursorOpacityAnimates: widget.cursorOpacityAnimates,
       expands: widget.expands,
       onTap: widget.onTap,
-      maxLengthEnforcement:
-          widget.maxLength != null ? MaxLengthEnforcement.enforced : null,
+      maxLengthEnforcement: widget.maxLength != null ? MaxLengthEnforcement.enforced : null,
       validator: (value) {
         final validationValue = widget.validator?.call(value);
 
         final isTextFieldValid = validationValue == null;
-        if (widget.onValidationChanged != null &&
-            isTextFieldValid != _textFieldIsValid) {
+        if (widget.onValidationChanged != null && isTextFieldValid != _textFieldIsValid) {
           onNextFrame(() => widget.onValidationChanged!(isTextFieldValid));
         }
 
         _textFieldIsValid = validationValue == null;
         return validationValue;
       },
-      autovalidateMode: widget.autoValidate
-          ? AutovalidateMode.always
-          : AutovalidateMode.disabled,
+      autovalidateMode: widget.autoValidate ? AutovalidateMode.always : AutovalidateMode.disabled,
       textInputAction: widget.textInputAction,
       onEditingComplete: widget.onEditingComplete,
       keyboardType: widget.textInputType,
-      style: widget.textStyleMutator != null
-          ? widget.textStyleMutator!(style)
-          : style,
+      style: widget.textStyleMutator != null ? widget.textStyleMutator!(style) : style,
       textCapitalization: widget.textCapitalization,
       obscureText: widget.obscureText,
       autocorrect: widget.autocorrect,
@@ -218,6 +220,17 @@ class BaseTextFieldState extends State<BaseTextField>
       controller: _textEditingController,
       decoration: widget.decoration,
     );
+
+    if (UniversalPlatform.isWeb) {
+      // ⚠️ We added the [SelectionArea], since we had an issue with the text filed in the web ->  https://github.com/flutter/flutter/issues/158095
+      return SelectableRegion(
+        focusNode: _selectableRegionFocusNode,
+        selectionControls: emptyTextSelectionControls,
+        child: textField,
+      );
+    }
+
+    return textField;
   }
 
   @override
@@ -294,6 +307,8 @@ class BaseTextFieldState extends State<BaseTextField>
     if (widget.focusNode == null) {
       _focusNode.dispose();
     }
+
+    _selectableRegionFocusNode.dispose();
     _textEditingController.dispose();
     super.dispose();
   }
