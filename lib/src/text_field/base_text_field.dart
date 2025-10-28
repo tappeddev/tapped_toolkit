@@ -69,6 +69,8 @@ class BaseTextField extends StatefulWidget {
 
   final VoidCallback? onTap;
 
+  final bool? enabled;
+
   const BaseTextField({
     required this.text,
     required this.onChanged,
@@ -100,6 +102,7 @@ class BaseTextField extends StatefulWidget {
     this.readOnly = false,
     this.cursorOpacityAnimates,
     this.onTap,
+    this.enabled,
     Key? key,
   }) : super(key: key);
 
@@ -228,6 +231,7 @@ class BaseTextFieldState extends State<BaseTextField>
       focusNode: _focusNode,
       controller: _textEditingController,
       decoration: widget.decoration,
+      enabled: widget.enabled,
     );
 
     if (UniversalPlatform.isWeb) {
