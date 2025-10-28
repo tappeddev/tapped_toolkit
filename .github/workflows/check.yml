@@ -1,6 +1,6 @@
 name: tapped_toolkit
 
-on: [push]
+on: [ push ]
 
 # Cancel previous builds by only allowing one concurrent build per ref.
 concurrency:
