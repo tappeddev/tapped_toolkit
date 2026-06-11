@@ -263,22 +263,24 @@ class BaseTextFieldState extends State<BaseTextField>
       _previousTextValue = text;
 
       // this will be called, whenever a change comes from outside and we need to handle the changed event.
-      if (text.isEmpty) {
-        _textEditingController.clear();
-      } else {
-        final selection = _textEditingController.selection;
+      onNextFrame(() {
+        if (text.isEmpty) {
+          _textEditingController.clear();
+        } else {
+          final selection = _textEditingController.selection;
 
-        final isNewTextSmaller = oldWidget.text.length > text.length;
-        _textEditingController.value = _textEditingController.value.copyWith(
-          text: text,
-          selection: isNewTextSmaller
-              ? TextSelection.collapsed(offset: text.length)
-              : selection.copyWith(
-                  baseOffset: text.length,
-                  extentOffset: text.length,
-                ),
-        );
-      }
+          final isNewTextSmaller = oldWidget.text.length > text.length;
+          _textEditingController.value = _textEditingController.value.copyWith(
+            text: text,
+            selection: isNewTextSmaller
+                ? TextSelection.collapsed(offset: text.length)
+                : selection.copyWith(
+                    baseOffset: text.length,
+                    extentOffset: text.length,
+                  ),
+          );
+        }
+      });
     }
   }
 
