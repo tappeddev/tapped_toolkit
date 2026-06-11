@@ -258,7 +258,7 @@ class BaseTextFieldState extends State<BaseTextField>
 
       // The change comes from outside. We update [_previousTextValue] before
       // mutating the controller so the controller listener ([_onChanged])
-      // short-circuits and does not re-emit [onChanged] for a value we already
+      // does not re-emit [onChanged] for a value we already
       // know about (which would write the external value straight back).
       _previousTextValue = text;
 
