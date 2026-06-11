@@ -256,25 +256,29 @@ class BaseTextFieldState extends State<BaseTextField>
       // We don't need anything whenever the change is from the textfield itself
       if (_textEditingController.text == text) return;
 
-      // this will be called, whenever a change comes from outside and we need to handle the changed event
-      onNextFrame(() {
-        if (text.isEmpty) {
-          _textEditingController.clear();
-        } else {
-          final selection = _textEditingController.selection;
+      // The change comes from outside. We update [_previousTextValue] before
+      // mutating the controller so the controller listener ([_onChanged])
+      // short-circuits and does not re-emit [onChanged] for a value we already
+      // know about (which would write the external value straight back).
+      _previousTextValue = text;
 
-          final isNewTextSmaller = oldWidget.text.length > text.length;
-          _textEditingController.value = _textEditingController.value.copyWith(
-            text: text,
-            selection: isNewTextSmaller
-                ? TextSelection.collapsed(offset: text.length)
-                : selection.copyWith(
-                    baseOffset: text.length,
-                    extentOffset: text.length,
-                  ),
-          );
-        }
-      });
+      // this will be called, whenever a change comes from outside and we need to handle the changed event.
+      if (text.isEmpty) {
+        _textEditingController.clear();
+      } else {
+        final selection = _textEditingController.selection;
+
+        final isNewTextSmaller = oldWidget.text.length > text.length;
+        _textEditingController.value = _textEditingController.value.copyWith(
+          text: text,
+          selection: isNewTextSmaller
+              ? TextSelection.collapsed(offset: text.length)
+              : selection.copyWith(
+                  baseOffset: text.length,
+                  extentOffset: text.length,
+                ),
+        );
+      }
     }
   }
 
