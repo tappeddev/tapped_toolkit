@@ -56,8 +56,8 @@ class CustomDropDown<T> extends StatefulWidget {
     this.autoValidate = false,
     this.itemHeight = 48.0,
     this.cornerRadius = 10,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   CustomDropDownState<T> createState() => CustomDropDownState<T>();

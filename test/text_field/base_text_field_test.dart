@@ -37,9 +37,9 @@ class _TestScreen extends StatefulWidget {
   final String initialTextFieldText;
 
   const _TestScreen({
-    Key? key,
+    super.key,
     this.initialTextFieldText = "",
-  }) : super(key: key);
+  });
 
   @override
   State<_TestScreen> createState() => _ScreenState();

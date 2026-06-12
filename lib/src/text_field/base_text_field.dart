@@ -101,8 +101,8 @@ class BaseTextField extends StatefulWidget {
     this.cursorOpacityAnimates,
     this.onTap,
     this.enabled,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   BaseTextFieldState createState() => BaseTextFieldState();
