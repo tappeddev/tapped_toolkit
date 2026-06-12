@@ -37,9 +37,9 @@ class _TestScreen extends StatefulWidget {
   final String initialTextFieldText;
 
   const _TestScreen({
-    Key? key,
+    super.key,
     this.initialTextFieldText = "",
-  }) : super(key: key);
+  });
 
   @override
   State<_TestScreen> createState() => _ScreenState();
@@ -64,7 +64,7 @@ class _ScreenState extends State<_TestScreen> {
               child: BaseTextField(
                 key: textFieldKey,
                 text: text,
-                onChanged: (newText, source) {
+                onChanged: (newText) {
                   setState(() => text = newText);
                 },
                 decoration: const InputDecoration(),

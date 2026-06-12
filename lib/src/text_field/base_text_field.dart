@@ -6,14 +6,12 @@ import 'package:tapped_toolkit/src/after_first_build/after_first_build_mixin.dar
 import 'package:tapped_toolkit/src/after_first_build/on_next_frame_extension.dart';
 import 'package:universal_platform/universal_platform.dart';
 
-enum TextFieldSource { inside, outside }
-
 typedef TextStyleMutation = TextStyle Function(TextStyle style);
 
 class BaseTextField extends StatefulWidget {
   final String text;
 
-  final void Function(String value, TextFieldSource source) onChanged;
+  final void Function(String value) onChanged;
   final void Function(String value)? onFieldSubmitted;
   final String? Function(String? value)? validator;
   final TextStyle Function(TextStyle)? textStyleMutator;
@@ -103,8 +101,8 @@ class BaseTextField extends StatefulWidget {
     this.cursorOpacityAnimates,
     this.onTap,
     this.enabled,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   BaseTextFieldState createState() => BaseTextFieldState();
@@ -252,30 +250,41 @@ class BaseTextFieldState extends State<BaseTextField>
 
     final text = widget.text;
 
-    if (oldWidget.text != text) {
-      // We don't need anything whenever the change is from the textfield itself
-      if (_textEditingController.text == text) return;
+    if (oldWidget.text == text) return;
 
-      // this will be called, whenever a change comes from outside and we need to handle the changed event
-      onNextFrame(() {
-        if (text.isEmpty) {
-          _textEditingController.clear();
-        } else {
-          final selection = _textEditingController.selection;
+    // We don't need anything whenever the change is from the textfield itself
+    if (_textEditingController.text == text) return;
 
-          final isNewTextSmaller = oldWidget.text.length > text.length;
-          _textEditingController.value = _textEditingController.value.copyWith(
-            text: text,
-            selection: isNewTextSmaller
-                ? TextSelection.collapsed(offset: text.length)
-                : selection.copyWith(
-                    baseOffset: text.length,
-                    extentOffset: text.length,
-                  ),
-          );
-        }
-      });
-    }
+    // External updates of [text] are propagated to the internal
+    // [TextEditingController] on the next frame (via `addPostFrameCallback`),
+    // not synchronously. This is required because mutating
+    // `TextEditingController.value` calls `notifyListeners()`, and Flutter's own
+    // listeners on that controller — most notably the surrounding [Form] /
+    // [FormField] and the internal `EditableText` — react by calling
+    // `markNeedsBuild`. Doing that during the build phase (which is exactly when
+    // `didUpdateWidget` runs) throws
+    // `setState() or markNeedsBuild() called during build`. Deferring the update
+    // to the next frame ensures the framework is out of the build phase before
+    // the controller is mutated.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // we need to wait until the next microtask
+      if (text.isEmpty) {
+        _textEditingController.clear();
+      } else {
+        final selection = _textEditingController.selection;
+
+        final isNewTextSmaller = oldWidget.text.length > text.length;
+        _textEditingController.value = _textEditingController.value.copyWith(
+          text: text,
+          selection: isNewTextSmaller
+              ? TextSelection.collapsed(offset: text.length)
+              : selection.copyWith(
+                  baseOffset: text.length,
+                  extentOffset: text.length,
+                ),
+        );
+      }
+    });
   }
 
   void validate() {
@@ -288,19 +297,18 @@ class BaseTextFieldState extends State<BaseTextField>
 
     _previousTextValue = value;
 
-    widget.onChanged(
-      value,
-      value == widget.text ? TextFieldSource.outside : TextFieldSource.inside,
-    );
+    if (value != widget.text) {
+      widget.onChanged(value);
+    }
 
     // we need to wait until the next microtask
-    await Future<void>.delayed(const Duration());
-
-    // ⚠️ validate after the new input is attached
-    // we always want to validate the new input when the current state is invalid
-    if (!_textFieldIsValid) {
-      _formFieldKey.currentState?.validate();
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // ⚠️ validate after the new input is attached
+      // we always want to validate the new input when the current state is invalid
+      if (!_textFieldIsValid) {
+        _formFieldKey.currentState?.validate();
+      }
+    });
   }
 
   void _addFocusNodeListener() {
