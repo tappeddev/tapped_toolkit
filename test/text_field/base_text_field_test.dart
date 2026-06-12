@@ -64,7 +64,7 @@ class _ScreenState extends State<_TestScreen> {
               child: BaseTextField(
                 key: textFieldKey,
                 text: text,
-                onChanged: (newText, source) {
+                onChanged: (newText) {
                   setState(() => text = newText);
                 },
                 decoration: const InputDecoration(),

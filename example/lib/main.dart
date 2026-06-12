@@ -30,11 +30,14 @@ class _ExampleAppState extends State<ExampleApp> {
                 children: [
                   BaseTextField(
                     text: _text,
-                    onChanged: (value, source) {
+                    onChanged: (value) {
+
+                      print("Changed to: $value");
+
                       setState(() => _text = value);
                     },
                     decoration:
-                        const InputDecoration(label: Text("Enter some text")),
+                        const InputDecoration(hintText: "Enter some text"),
                     textStyle: const TextStyle(),
                   ),
                   const SizedBox(height: 25),
@@ -43,6 +46,12 @@ class _ExampleAppState extends State<ExampleApp> {
                       setState(() => _text = "This is a really long text...");
                     },
                     child: const Text("Add large text"),
+                  ),
+                  MaterialButton(
+                    onPressed: () {
+                      setState(() => _text = "");
+                    },
+                    child: const Text("Remove text"),
                   ),
                   MaterialButton(
                     onPressed: () {

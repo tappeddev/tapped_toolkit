@@ -6,14 +6,12 @@ import 'package:tapped_toolkit/src/after_first_build/after_first_build_mixin.dar
 import 'package:tapped_toolkit/src/after_first_build/on_next_frame_extension.dart';
 import 'package:universal_platform/universal_platform.dart';
 
-enum TextFieldSource { inside, outside }
-
 typedef TextStyleMutation = TextStyle Function(TextStyle style);
 
 class BaseTextField extends StatefulWidget {
   final String text;
 
-  final void Function(String value, TextFieldSource source) onChanged;
+  final void Function(String value) onChanged;
   final void Function(String value)? onFieldSubmitted;
   final String? Function(String? value)? validator;
   final TextStyle Function(TextStyle)? textStyleMutator;
@@ -256,25 +254,23 @@ class BaseTextFieldState extends State<BaseTextField>
       // We don't need anything whenever the change is from the textfield itself
       if (_textEditingController.text == text) return;
 
-      // this will be called, whenever a change comes from outside and we need to handle the changed event
-      onNextFrame(() {
-        if (text.isEmpty) {
-          _textEditingController.clear();
-        } else {
-          final selection = _textEditingController.selection;
+      // we need to wait until the next microtask
+      if (text.isEmpty) {
+        _textEditingController.clear();
+      } else {
+        final selection = _textEditingController.selection;
 
-          final isNewTextSmaller = oldWidget.text.length > text.length;
-          _textEditingController.value = _textEditingController.value.copyWith(
-            text: text,
-            selection: isNewTextSmaller
-                ? TextSelection.collapsed(offset: text.length)
-                : selection.copyWith(
-                    baseOffset: text.length,
-                    extentOffset: text.length,
-                  ),
-          );
-        }
-      });
+        final isNewTextSmaller = oldWidget.text.length > text.length;
+        _textEditingController.value = _textEditingController.value.copyWith(
+          text: text,
+          selection: isNewTextSmaller
+              ? TextSelection.collapsed(offset: text.length)
+              : selection.copyWith(
+                  baseOffset: text.length,
+                  extentOffset: text.length,
+                ),
+        );
+      }
     }
   }
 
@@ -288,10 +284,9 @@ class BaseTextFieldState extends State<BaseTextField>
 
     _previousTextValue = value;
 
-    widget.onChanged(
-      value,
-      value == widget.text ? TextFieldSource.outside : TextFieldSource.inside,
-    );
+    if (value != widget.text) {
+      widget.onChanged(value);
+    }
 
     // we need to wait until the next microtask
     await Future<void>.delayed(const Duration());
