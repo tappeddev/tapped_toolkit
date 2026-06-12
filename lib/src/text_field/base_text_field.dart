@@ -255,7 +255,18 @@ class BaseTextFieldState extends State<BaseTextField>
     // We don't need anything whenever the change is from the textfield itself
     if (_textEditingController.text == text) return;
 
-    Future.microtask(() {
+    // External updates of [text] are propagated to the internal
+    // [TextEditingController] on the next frame (via `addPostFrameCallback`),
+    // not synchronously. This is required because mutating
+    // `TextEditingController.value` calls `notifyListeners()`, and Flutter's own
+    // listeners on that controller — most notably the surrounding [Form] /
+    // [FormField] and the internal `EditableText` — react by calling
+    // `markNeedsBuild`. Doing that during the build phase (which is exactly when
+    // `didUpdateWidget` runs) throws
+    // `setState() or markNeedsBuild() called during build`. Deferring the update
+    // to the next frame ensures the framework is out of the build phase before
+    // the controller is mutated.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       // we need to wait until the next microtask
       if (text.isEmpty) {
         _textEditingController.clear();
@@ -291,13 +302,13 @@ class BaseTextFieldState extends State<BaseTextField>
     }
 
     // we need to wait until the next microtask
-    await Future<void>.delayed(const Duration());
-
-    // ⚠️ validate after the new input is attached
-    // we always want to validate the new input when the current state is invalid
-    if (!_textFieldIsValid) {
-      _formFieldKey.currentState?.validate();
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // ⚠️ validate after the new input is attached
+      // we always want to validate the new input when the current state is invalid
+      if (!_textFieldIsValid) {
+        _formFieldKey.currentState?.validate();
+      }
+    });
   }
 
   void _addFocusNodeListener() {
