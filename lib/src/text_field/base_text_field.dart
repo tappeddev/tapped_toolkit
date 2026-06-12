@@ -250,10 +250,12 @@ class BaseTextFieldState extends State<BaseTextField>
 
     final text = widget.text;
 
-    if (oldWidget.text != text) {
-      // We don't need anything whenever the change is from the textfield itself
-      if (_textEditingController.text == text) return;
+    if (oldWidget.text == text) return;
 
+    // We don't need anything whenever the change is from the textfield itself
+    if (_textEditingController.text == text) return;
+
+    Future.microtask(() {
       // we need to wait until the next microtask
       if (text.isEmpty) {
         _textEditingController.clear();
@@ -271,7 +273,7 @@ class BaseTextFieldState extends State<BaseTextField>
                 ),
         );
       }
-    }
+    });
   }
 
   void validate() {
