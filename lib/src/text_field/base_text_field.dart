@@ -248,8 +248,10 @@ class BaseTextFieldState extends State<BaseTextField>
   void didUpdateWidget(covariant BaseTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
 
+    // the new text, which was provided from the widget
     final text = widget.text;
 
+    // in case the text didn't change, we don't need to do anything
     if (oldWidget.text == text) return;
 
     // We don't need anything whenever the change is from the textfield itself
@@ -267,6 +269,8 @@ class BaseTextFieldState extends State<BaseTextField>
     // to the next frame ensures the framework is out of the build phase before
     // the controller is mutated.
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
       // we need to wait until the next microtask
       if (text.isEmpty) {
         _textEditingController.clear();
@@ -303,6 +307,7 @@ class BaseTextFieldState extends State<BaseTextField>
 
     // we need to wait until the next microtask
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       // ⚠️ validate after the new input is attached
       // we always want to validate the new input when the current state is invalid
       if (!_textFieldIsValid) {
