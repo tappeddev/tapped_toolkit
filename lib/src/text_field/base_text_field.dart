@@ -161,8 +161,7 @@ class BaseTextFieldState extends State<BaseTextField>
       _textEditingController = TextEditingController();
     }
 
-    _textEditingController
-        .addListener(() => _onChanged(_textEditingController.text));
+    _textEditingController.addListener(_onChanged);
 
     if (UniversalPlatform.isWeb) {
       _selectableRegionFocusNode.addListener(() {
@@ -268,7 +267,7 @@ class BaseTextFieldState extends State<BaseTextField>
     // `setState() or markNeedsBuild() called during build`. Deferring the update
     // to the next frame ensures the framework is out of the build phase before
     // the controller is mutated.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    onNextFrame(() {
       if (!mounted) return;
 
       // we need to wait until the next microtask
@@ -295,8 +294,9 @@ class BaseTextFieldState extends State<BaseTextField>
     _formFieldKey.currentState?.validate();
   }
 
-  // ignore: avoid_void_async
-  void _onChanged(String value) async {
+  void _onChanged() {
+    final value = _textEditingController.text;
+
     if (_previousTextValue == value) return;
 
     _previousTextValue = value;
@@ -305,8 +305,9 @@ class BaseTextFieldState extends State<BaseTextField>
       widget.onChanged(value);
     }
 
-    // we need to wait until the next microtask
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // we need to wait for the next frame, otherwise the change + the set state happens in the same moment and throws:
+    // `setState() or markNeedsBuild() called during build`
+    onNextFrame(() {
       if (!mounted) return;
       // ⚠️ validate after the new input is attached
       // we always want to validate the new input when the current state is invalid
